@@ -1,0 +1,16 @@
+{
+  "products": [
+    {
+      "name": "Sản phẩm A",
+      "price": "120",
+      "desc": "Mô tả",
+      "descct": "Siêu chi tiết",
+      "image": [
+        "https://res.cloudinary.com/dawxspemp/image/upload/v1710461720/React-Node/jg2ttuk84zlakbooggt7.jpg",
+        "https://res.cloudinary.com/dawxspemp/image/upload/v1710461723/React-Node/srcj1fjrfwuchdbkb5jo.png",
+        "https://res.cloudinary.com/dawxspemp/image/upload/v1710461729/React-Node/yyhfsu8vusvtks0sriyp.png"
+      ],
+      "id": 1
+    }
+  ]
+}
