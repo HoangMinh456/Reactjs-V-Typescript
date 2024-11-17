@@ -34,13 +34,14 @@ const UpdateTags = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries('TAGS_KEY')
+            navigate('/admin/tags');
+            toast.success('Cập nhật thành công');
         }
     })
 
     const onSubmit = (data: any) => {
         mutatiton.mutate(data);
-        navigate('/admin/tags');
-        toast.success('Cập nhật thành công');
+        // console.log(data)
     }
 
     return (

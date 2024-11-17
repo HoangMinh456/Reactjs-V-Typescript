@@ -26,13 +26,14 @@ const AddTags = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries('TAGS_KEY')
+            navigate('/admin/tags');
+            toast.success('Thêm thành công');
         }
     })
 
     const onSubmit = (data: any) => {
         mutatiton.mutate(data);
-        navigate('/admin/tags');
-        toast.success('Thêm thành công');
+
     }
 
     return (

@@ -62,7 +62,7 @@ hr {
   }
 
   .nav2 {
-    width: 21%;
+    width: 15%;
     padding-right: 3%;
     display: flex;
     align-items: center;
@@ -2057,6 +2057,8 @@ section.cart {
       }
 
       .checkout-leff__moreinfo {
+        display: flex;
+        flex-direction: column;
         margin-top: 39px;
       }
 
@@ -2664,7 +2666,7 @@ section.cart {
 
 //Sidebar Admin
 aside.action {
-  width: 4.5%;
+  width: 3.5%;
 }
 
 //select form admin

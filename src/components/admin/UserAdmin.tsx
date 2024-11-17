@@ -14,23 +14,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export function CategoryAdmin() {
+export function UserAdmin() {
     const queryClient = useQueryClient();
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['CATEGORY_KEY'],
+        queryKey: ['USER_KEY'],
         queryFn: async () => {
-            const { data } = await axios.get('http://localhost:8080/api/category');
+            const { data } = await axios.get('http://localhost:8080/api/user');
             return data;
         }
     })
 
     const mutation = useMutation({
         mutationFn: async (id: any) => {
-            const { data } = await axios.delete(`http://localhost:8080/api/category/${id}`);
+            const { data } = await axios.delete(`http://localhost:8080/api/user/${id}`);
             return data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries('CATEGORY_KEY');
+            queryClient.invalidateQueries('USER_KEY');
             toast.success('Xóa thành công')
         }
     })
@@ -45,16 +45,17 @@ export function CategoryAdmin() {
     return (
         <div className="container-table tw-w-full tw-p-5">
             <div className="tw-flex tw-justify-between tw-mb-6">
-                <h1 className="tw-text-3xl">Manage Category</h1>
-                <Button className=""><Link to={`/admin/category/add`}>Thêm danh mục</Link></Button>
+                <h1 className="tw-text-3xl">Manage User</h1>
             </div>
             <Table>
                 {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                 <TableHeader>
                     <TableRow>
                         <TableHead className="tw-w-[100px]">STT</TableHead>
-                        <TableHead>Tên sản phẩm</TableHead>
-                        <TableHead className="tw-text-right">Chức năng</TableHead>
+                        <TableHead>Tên</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Avata</TableHead>
+                        {/* <TableHead className="tw-text-right">Chức năng</TableHead> */}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -62,9 +63,11 @@ export function CategoryAdmin() {
                         <TableRow key={index} >
                             <TableCell className="tw-font-medium">{index + 1}</TableCell>
                             <TableCell>{item.name}</TableCell>
+                            <TableCell>{item.email}</TableCell>
+                            <TableCell><img className="tw-w-10 tw-h-10" src={item.avata} alt="" /></TableCell>
                             <TableCell className="tw-text-right">
-                                <Link to={`/admin/category/${item._id}/edit`}><Button variant="secondary">Sửa</Button></Link>
-                                <Button onClick={() => handleRemove(item._id)} className="tw-ml-3" variant="destructive">Xóa</Button>
+                                {/* <Link to={`/admin/user/${item._id}/edit`}><Button variant="secondary">Sửa</Button></Link> */}
+                                {/* <Button onClick={() => handleRemove(item._id)} className="tw-ml-3" variant="destructive">Xóa</Button> */}
                             </TableCell>
                         </TableRow>
                     ))}

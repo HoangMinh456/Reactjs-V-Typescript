@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
@@ -9,12 +9,12 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useLocalStorage } from '@/hooks/useStorage';
 import { toast } from 'react-toastify';
+import { AppContext } from '@/context/ProductContextProvider';
 
 const ProductDetail = () => {
     // idPro và idAttribute
     const { id, idAttri } = useParams();
-    const [user] = useLocalStorage('user', {});
-    const userId = user?.user?._id;
+    const { userId }: any = useContext(AppContext)
 
     const queryClient = useQueryClient();
     const [idPro, setIdPro] = useState(id);
@@ -61,6 +61,7 @@ const ProductDetail = () => {
         }
     })
 
+
     const { data: sizes } = useQuery({
         queryKey: ['SIZES_KEY'],
         queryFn: async () => {
@@ -69,15 +70,16 @@ const ProductDetail = () => {
         }
     })
 
+
     const sizeName = (idSize: any) => {
         const data = sizes?.find((item: any) => item._id == idSize);
         return data?.name;
     }
 
+
     //Size and Color
 
     const sizeColorMap: any = {};
-
     // Duyệt qua mỗi thuộc tính và thêm color vào size tương ứng trong sizeColorMap
     attributeData?.map((att: any) => {
         const { size, color } = att;
@@ -106,6 +108,7 @@ const ProductDetail = () => {
     })
     //End size and Color
     const id_pro = id!.slice(-6, -1);
+
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['CATEGORY_KEY'],
@@ -220,6 +223,10 @@ const ProductDetail = () => {
     // window.scrollTo(0, 0);
 
     const addTo = (e: any) => {
+        if (userId === '') {
+            toast.warning('Vui lòng đăng nhập để tiếp tục');
+            return;
+        }
         const item = {
             userId: userId,
             productItem: e._id,
@@ -352,9 +359,9 @@ const ProductDetail = () => {
                             <div className="product-detail-right-action__add">
                                 <button type="submit" onClick={() => addTo(product)}>Add To Cart</button>
                             </div>
-                            <div className="product-detail-right-action__compare">
+                            {/* <div className="product-detail-right-action__compare">
                                 <button type="submit">+ Compare</button>
-                            </div>
+                            </div> */}
                         </div>
                         <hr />
                         <div className="product-detail-right-more">

@@ -82,6 +82,8 @@ const AttributePage = () => {
         return data?.name;
     }
 
+    // console.log(attributes)
+
     const invoices = Array.isArray(attributes) ? attributes.map((item: any) => ({
         _id: item._id,
         size: sizeName(item.size._id),

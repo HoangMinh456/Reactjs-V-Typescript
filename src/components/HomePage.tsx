@@ -1,14 +1,14 @@
+import { AppContext } from '@/context/ProductContextProvider';
 import { useLocalStorage } from '@/hooks/useStorage';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 const HomePage = ({ products }: any) => {
     const productsNew = products.data;
-    const [user] = useLocalStorage('user', {});
-    const userId = user?.user?._id;
+    const { user, userId, setUserId }: any = useContext(AppContext)
     const queryClient = useQueryClient();
 
     // console.log(productsNew)
@@ -51,7 +51,7 @@ const HomePage = ({ products }: any) => {
     //     })
     // }))
 
-    const allProducts = productsNew?.map((item: any) => {
+    productsNew?.map((item: any) => {
         const pro = {
             ...item,
             attribute: {
@@ -76,6 +76,8 @@ const HomePage = ({ products }: any) => {
         }
         addToCart.mutate(item);
     }
+
+    // console.log(allPro)
 
     return (
         <>

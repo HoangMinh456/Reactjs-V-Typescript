@@ -47,7 +47,7 @@ const AddAttribute = () => {
     const addAttribute = useMutation({
         mutationFn: async (newData) => {
             const response: any = await axios.post(`http://localhost:8080/api/attribute`, newData);
-            return response.data._id;
+            return response.data;
         }, onSuccess: () => {
             toast.success('Thêm thành công');
         }
@@ -60,6 +60,7 @@ const AddAttribute = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries('ATTRIBUTE_KEYS');
+            navigate(`/admin/products/attribute/${id}`);
         }
     })
 
@@ -76,7 +77,6 @@ const AddAttribute = () => {
             }
             updateProduct.mutate(newPro);
             // setPercent(0);
-            navigate(`/admin/products/attribute/${id}`);
         } catch (error) {
             console.log(error);
         }

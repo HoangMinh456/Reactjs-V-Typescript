@@ -25,6 +25,7 @@ const TagsAdmin = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries('TAGS_KEY')
+            toast.success('Xóa thành công');
         }
     })
 
@@ -32,7 +33,7 @@ const TagsAdmin = () => {
         const confirm = window.confirm('Bạn chắc chứ?');
         if (confirm) {
             mutation.mutate(id);
-            toast.success('Xóa thành công');
+
         }
 
     }

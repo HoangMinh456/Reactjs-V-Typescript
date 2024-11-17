@@ -1,7 +1,30 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { LogOut, User } from 'lucide-react'
+import { useLocalStorage } from '@/hooks/useStorage'
+import { toast } from 'react-toastify'
+import { AppContext } from '@/context/ProductContextProvider'
 
 const HeaderPage = () => {
+    const navigate = useNavigate();
+    const { user, userId, setUserId }: any = useContext(AppContext)
+    // console.log(user)
+
+    const checkUser = () => {
+        if (!userId) {
+            return toast.warning('Đăng nhập để tiếp tục');
+        }
+        navigate('/cart');
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        setUserId('')
+    }
+
     return (
 
         <div className="header header-detail">
@@ -23,39 +46,83 @@ const HeaderPage = () => {
             {/* Nav  */}
             <div className="nav">
                 <Link className="nav-title" to={`/`}>Home</Link>
-                <Link className="nav-title" to={`/shop`}>Shop</Link>
+                <Link className="nav-title" to={`#`}>Shop</Link>
                 <a className="nav-title" href="#">About</a>
                 <a className="nav-title" href="#">Contact</a>
             </div>
             {/* Accout, Cart */}
             <div className="nav2">
-                <div className="account">
-                    <Link className="nav2-title" to={`/signup`}>
-                        <svg width={24} height={20} viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21.3333 9.99996V4.16663H23.6666V11.1666H21.3333M21.3333 15.8333H23.6666V13.5H21.3333M9.66659 11.1666C12.7816 11.1666 18.9999 12.73 18.9999 15.8333V19.3333H0.333252V15.8333C0.333252 12.73 6.55159 11.1666 9.66659 11.1666ZM9.66659 0.666626C10.9043 0.666626 12.0912 1.15829 12.9664 2.03346C13.8416 2.90863 14.3333 4.09562 14.3333 5.33329C14.3333 6.57097 13.8416 7.75795 12.9664 8.63312C12.0912 9.50829 10.9043 9.99996 9.66659 9.99996C8.42891 9.99996 7.24192 9.50829 6.36675 8.63312C5.49158 7.75795 4.99992 6.57097 4.99992 5.33329C4.99992 4.09562 5.49158 2.90863 6.36675 2.03346C7.24192 1.15829 8.42891 0.666626 9.66659 0.666626ZM9.66659 13.3833C6.20159 13.3833 2.54992 15.0866 2.54992 15.8333V17.1166H16.7833V15.8333C16.7833 15.0866 13.1316 13.3833 9.66659 13.3833ZM9.66659 2.88329C9.01681 2.88329 8.39364 3.14142 7.93417 3.60088C7.47471 4.06034 7.21659 4.68351 7.21659 5.33329C7.21659 5.98307 7.47471 6.60624 7.93417 7.0657C8.39364 7.52517 9.01681 7.78329 9.66659 7.78329C10.3164 7.78329 10.9395 7.52517 11.399 7.0657C11.8585 6.60624 12.1166 5.98307 12.1166 5.33329C12.1166 4.68351 11.8585 4.06034 11.399 3.60088C10.9395 3.14142 10.3164 2.88329 9.66659 2.88329Z" fill="black" />
-                        </svg>
-                    </Link>
-                </div>
-                <div className="search">
+                {/* <div className="search">
                     <a className="nav2-title" href="#">
                         <svg width={25} height={25} viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M23.4999 23.5L18.2663 18.257M21.1666 11.25C21.1666 13.8801 20.1218 16.4024 18.2621 18.2622C16.4023 20.1219 13.88 21.1667 11.2499 21.1667C8.61985 21.1667 6.09751 20.1219 4.23778 18.2622C2.37804 16.4024 1.33325 13.8801 1.33325 11.25C1.33325 8.61998 2.37804 6.09763 4.23778 4.2379C6.09751 2.37816 8.61985 1.33337 11.2499 1.33337C13.88 1.33337 16.4023 2.37816 18.2621 4.2379C20.1218 6.09763 21.1666 8.61998 21.1666 11.25V11.25Z" stroke="black" strokeWidth={2} strokeLinecap="round" />
                         </svg>
                     </a>
+                </div> */}
+                <div className="account">
+                    {userId && userId != ''
+                        ?
+                        user.role === 'admin'
+                            ?
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <Avatar>
+                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                        <AvatarFallback>CN</AvatarFallback>
+                                    </Avatar></DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <Link to={`/admin`}>
+                                        <DropdownMenuItem className='tw-cursor-pointer'>
+                                            <User className="tw-mr-2 tw-h-4 tw-w-4" />
+                                            <span>Admin</span>
+                                        </DropdownMenuItem>
+                                    </Link>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className='tw-cursor-pointer' onClick={() => handleLogout()}>
+                                        <LogOut className="tw-mr-2 tw-h-4 tw-w-4" />
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            :
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <Avatar>
+                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                        <AvatarFallback>CN</AvatarFallback>
+                                    </Avatar></DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => handleLogout()}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        :
+                        <Link className="nav2-title" to={`/signin`}>
+                            <svg width={24} height={20} viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21.3333 9.99996V4.16663H23.6666V11.1666H21.3333M21.3333 15.8333H23.6666V13.5H21.3333M9.66659 11.1666C12.7816 11.1666 18.9999 12.73 18.9999 15.8333V19.3333H0.333252V15.8333C0.333252 12.73 6.55159 11.1666 9.66659 11.1666ZM9.66659 0.666626C10.9043 0.666626 12.0912 1.15829 12.9664 2.03346C13.8416 2.90863 14.3333 4.09562 14.3333 5.33329C14.3333 6.57097 13.8416 7.75795 12.9664 8.63312C12.0912 9.50829 10.9043 9.99996 9.66659 9.99996C8.42891 9.99996 7.24192 9.50829 6.36675 8.63312C5.49158 7.75795 4.99992 6.57097 4.99992 5.33329C4.99992 4.09562 5.49158 2.90863 6.36675 2.03346C7.24192 1.15829 8.42891 0.666626 9.66659 0.666626ZM9.66659 13.3833C6.20159 13.3833 2.54992 15.0866 2.54992 15.8333V17.1166H16.7833V15.8333C16.7833 15.0866 13.1316 13.3833 9.66659 13.3833ZM9.66659 2.88329C9.01681 2.88329 8.39364 3.14142 7.93417 3.60088C7.47471 4.06034 7.21659 4.68351 7.21659 5.33329C7.21659 5.98307 7.47471 6.60624 7.93417 7.0657C8.39364 7.52517 9.01681 7.78329 9.66659 7.78329C10.3164 7.78329 10.9395 7.52517 11.399 7.0657C11.8585 6.60624 12.1166 5.98307 12.1166 5.33329C12.1166 4.68351 11.8585 4.06034 11.399 3.60088C10.9395 3.14142 10.3164 2.88329 9.66659 2.88329Z" fill="black" />
+                            </svg>
+                        </Link>}
+
                 </div>
-                <div className="favourite">
+                {/* <div className="favourite">
                     <a className="nav2-title" href="#">
                         <svg width={28} height={28} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8.16659 3.5C4.94542 3.5 2.33325 6.08533 2.33325 9.275C2.33325 11.8498 3.35409 17.9608 13.4026 24.1383C13.5826 24.2479 13.7892 24.3058 13.9999 24.3058C14.2106 24.3058 14.4173 24.2479 14.5973 24.1383C24.6458 17.9608 25.6666 11.8498 25.6666 9.275C25.6666 6.08533 23.0544 3.5 19.8333 3.5C16.6121 3.5 13.9999 7 13.9999 7C13.9999 7 11.3878 3.5 8.16659 3.5Z" stroke="black" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </a>
-                </div>
-                <div className="cart">
-                    <Link className="nav2-title" to={`/cart`}>
+                </div> */}
+                <div className="cart tw-cursor-pointer">
+                    <div onClick={() => checkUser()} className="nav2-title" >
                         <svg width={28} height={28} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M25.2354 19.1926H8.95225L9.76982 17.5273L23.3542 17.5027C23.8136 17.5027 24.2073 17.1746 24.2894 16.7207L26.1706 6.19062C26.2198 5.91445 26.146 5.63008 25.9655 5.41406C25.8763 5.30775 25.7651 5.22211 25.6395 5.16309C25.5139 5.10407 25.377 5.07308 25.2382 5.07227L7.95693 5.01484L7.80928 4.32031C7.71631 3.87734 7.31709 3.55469 6.86318 3.55469H2.63857C2.38258 3.55469 2.13707 3.65638 1.95605 3.8374C1.77503 4.01841 1.67334 4.26393 1.67334 4.51992C1.67334 4.77592 1.77503 5.02143 1.95605 5.20245C2.13707 5.38346 2.38258 5.48516 2.63857 5.48516H6.08115L6.72646 8.55312L8.31514 16.2449L6.26982 19.5836C6.16361 19.727 6.09963 19.8972 6.08514 20.075C6.07064 20.2528 6.1062 20.4312 6.18779 20.5898C6.35186 20.9152 6.68271 21.1203 7.04912 21.1203H8.76631C8.40023 21.6065 8.20249 22.1988 8.20303 22.8074C8.20303 24.3551 9.46084 25.6129 11.0085 25.6129C12.5562 25.6129 13.814 24.3551 13.814 22.8074C13.814 22.1977 13.6116 21.6043 13.2507 21.1203H17.6558C17.2897 21.6065 17.0919 22.1988 17.0925 22.8074C17.0925 24.3551 18.3503 25.6129 19.8979 25.6129C21.4456 25.6129 22.7034 24.3551 22.7034 22.8074C22.7034 22.1977 22.5011 21.6043 22.1401 21.1203H25.2382C25.7687 21.1203 26.2034 20.6883 26.2034 20.1551C26.2018 19.8994 26.0992 19.6546 25.9178 19.4743C25.7365 19.294 25.4912 19.1927 25.2354 19.1926ZM8.35889 6.91797L24.1034 6.96992L22.5612 15.6051L10.1937 15.627L8.35889 6.91797ZM11.0085 23.6715C10.5327 23.6715 10.1444 23.2832 10.1444 22.8074C10.1444 22.3316 10.5327 21.9434 11.0085 21.9434C11.4843 21.9434 11.8726 22.3316 11.8726 22.8074C11.8726 23.0366 11.7815 23.2564 11.6195 23.4184C11.4574 23.5805 11.2377 23.6715 11.0085 23.6715ZM19.8979 23.6715C19.4222 23.6715 19.0339 23.2832 19.0339 22.8074C19.0339 22.3316 19.4222 21.9434 19.8979 21.9434C20.3737 21.9434 20.762 22.3316 20.762 22.8074C20.762 23.0366 20.671 23.2564 20.5089 23.4184C20.3469 23.5805 20.1271 23.6715 19.8979 23.6715Z" fill="black" />
                         </svg>
-                    </Link>
+                    </div>
                 </div>
             </div>
             <label htmlFor="nav_check" className="hamburger" id="hamburger">

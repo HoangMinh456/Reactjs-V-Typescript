@@ -4,10 +4,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ColorSize from './ColorSize';
 
 const CartPage = () => {
     const [user] = useLocalStorage('user', {});
-    const userId = user?.user?._id;
+    const userId = user?._id;
 
     const queryClient = useQueryClient();
     const { data, isLoading, isError } = useQuery({
@@ -18,7 +19,10 @@ const CartPage = () => {
         }
     })
 
+    // console.log(data); 
+
     const products: any = [];
+    // console.log(products)
 
     const { data: sizes } = useQuery({
         queryKey: ['SIZES_KEY'],
@@ -102,7 +106,7 @@ const CartPage = () => {
 
     let total2 = 0;
     data?.forEach((item: any) => {
-        let subTotal = (item.check ? item.pricesale : item.price).replace(/\./g, "") * item.quantity;
+        let subTotal = (item.checked ? item.pricesale : item.price).replace(/\./g, "") * item.quantity;
         total2 += subTotal;
     });
 
@@ -138,6 +142,7 @@ const CartPage = () => {
                                     <th>Product</th>
                                     <th>Price</th>
                                     <th>Quantity</th>
+                                    {/* <th></th> */}
                                     <th>Subtotal</th>
                                     <th />
                                 </tr>
@@ -161,7 +166,8 @@ const CartPage = () => {
                                         </td>
                                         <td className="table__price">{item.checked ? item.pricesale : item.price}<span>đ</span> </td>
                                         <td className="table__quantity"><div className='tw-cursor-pointer tw-select-none' onClick={() => increase(item)}>+</div><input type="text" value={item.quantity} data-vale={item.quantity} min={1} max={99} readOnly /><div className='tw-cursor-pointer tw-select-none' onClick={() => decrease(item)}>-</div></td>
-                                        <td className="table__total">{Intl.NumberFormat("vi-VN").format((item.check ? item.pricesale : item.price).replace(/\./g, "") * item.quantity)}<span>đ</span> </td>
+                                        {/* <td><ColorSize id={item.idPro} idAttri={item.idAttri} /></td> */}
+                                        <td className="table__total">{Intl.NumberFormat("vi-VN").format((item.checked ? item.pricesale : item.price).replace(/\./g, "") * item.quantity)}<span>đ</span> </td>
                                         <td className="table__delete tw-cursor-pointer" onClick={() => remove(item)}><img src="/images/icons/Delete.svg" /></td>
                                     </tr>
                                 ))}

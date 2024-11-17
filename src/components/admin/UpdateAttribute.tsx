@@ -51,6 +51,8 @@ const UpdateAttribute = () => {
             return data;
         }, onSuccess: () => {
             queryClient.invalidateQueries('ATTRIBUTE_KEYS');
+            navigate(`/admin/products/attribute/${idpro}`);
+            toast.success('Cập nhật thành công');
         }
     })
 
@@ -60,8 +62,6 @@ const UpdateAttribute = () => {
             const giasale = new Intl.NumberFormat("vi-VN").format((parseInt(data.price) - (parseInt(data.price) * product.sale / 100)));
             const newData = ({ ...data, price: priceVn, pricesale: giasale });
             updateAttribute.mutate(newData);
-            navigate(`/admin/products/attribute/${idpro}`);
-            toast.success('Cập nhật thành công');
         } catch (error) {
             console.log(error);
         }

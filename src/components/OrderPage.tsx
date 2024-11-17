@@ -1,15 +1,15 @@
+import { AppContext } from '@/context/ProductContextProvider';
 import { useLocalStorage } from '@/hooks/useStorage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import React from 'react'
+import React, { useContext } from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const OrderPage = () => {
-    const [user] = useLocalStorage('user', {});
-    const userId = user?.user?._id;
-
+    const { user, userId }: any = useContext(AppContext)
+    console.log(user)
     const navigate = useNavigate();
     const { register, handleSubmit, ...rest } = useForm();
 
@@ -53,15 +53,16 @@ const OrderPage = () => {
             userId: userId,
             items: cart,
             totalPrice: total2,
-            customerInfo: { ...formData },
+            customerInfo: { ...formData, payment: "COD" },
         }
         const item = {
             userId: userId
         }
-        // console.log(data);
+        // console.log(data)
         createOrder.mutate(data);
         removeAll.mutate(item);
         navigate(`/`);
+
     }
 
     // console.log(cart);
@@ -134,7 +135,7 @@ const OrderPage = () => {
                             <input type="email" {...register('email')} />
                         </div>
                         <div className="checkout-leff__moreinfo">
-                            <label htmlFor="email">Note</label>
+                            <label htmlFor="note">Note</label>
                             <input type="text" {...register('note')} />
                         </div>
                     </div>

@@ -15,7 +15,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // import "bootstrap/dist/css/bootstrap.min.css"
 
 type ProductAddProps = {
-    onAdd: (product: any) => void
+    onAdd: (product: any) => void,
+    check: boolean,
+    setCheck: boolean
 }
 
 type Input = {
@@ -33,12 +35,11 @@ type Input = {
     checked: boolean,
 }
 
-
-const AddProductPage = ({ onAdd }: ProductAddProps) => {
+const AddProductPage = ({ onAdd, check, setCheck }: ProductAddProps) => {
     const { register, handleSubmit, formState: { errors } } = useForm<Input>();
     const navigate = useNavigate();
     const { toast } = useToast();
-    const [check, setCheck] = useState(false);
+
 
     const [percent, setPercent] = useState(0);
     let newPercent = 0;
@@ -69,8 +70,8 @@ const AddProductPage = ({ onAdd }: ProductAddProps) => {
 
     function cloudinaryMess() {
         toast({
-            title: "Cloudinary ",
-            description: "Ảnh đang được tải lên cloudinary, vui lòng đợi trong giây lát!"
+            title: "Admin",
+            description: "Vui lòng đợi trong giây lát!"
         })
     }
 
@@ -84,7 +85,7 @@ const AddProductPage = ({ onAdd }: ProductAddProps) => {
             // const giasale = new Intl.NumberFormat("vi-VN").format((parseInt(data.price) - (parseInt(data.price) * data.sale / 100)).toFixed(3));
             const giasale = new Intl.NumberFormat("vi-VN").format(parseFloat((parseInt(data.price) - (parseInt(data.price) * data.sale / 100)).toFixed(3)));
             onAdd({ ...data, price: priceVn, pricesale: giasale, image: url, imagemain: urlmain, checked: false });
-            // console.log(data)
+            // console.log({ ...data, price: priceVn, pricesale: giasale, image: url, imagemain: urlmain, checked: false })
             setPercent(0);
         } catch (error) {
             console.log(error);

@@ -46,7 +46,7 @@ const UpdatePage = ({ onUpdate }: ProductUpdateProps) => {
         queryFn: async () => {
             const { data } = await axios.get(`http://localhost:8080/api/products/${id}`)
             reset(data);
-            console.log(data);
+            // console.log(data);
             return data;
         }
     })
@@ -69,8 +69,8 @@ const UpdatePage = ({ onUpdate }: ProductUpdateProps) => {
 
     function cloudinaryMess() {
         toast({
-            title: "Cloudinary ",
-            description: "Ảnh đang được tải lên cloudinary, vui lòng đợi trong giây lát!"
+            title: "Admin",
+            description: "Vui lòng đợi trong giây lát!"
         })
     }
 

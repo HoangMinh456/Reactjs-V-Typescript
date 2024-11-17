@@ -91,31 +91,41 @@ type Payment = {
 }
 
 export const columns: ColumnDef<Payment>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+    // {
+    //     id: "select",
+    //     header: ({ table }) => (
+    //         <Checkbox
+    //             checked={
+    //                 table.getIsAllPageRowsSelected() ||
+    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
+    //             }
+    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //             aria-label="Select all"
+    //         />
+    //     ),
+    //     cell: ({ row }) => (
+    //         <Checkbox
+    //             checked={row.getIsSelected()}
+    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //             aria-label="Select row"
+    //         />
+    //     ),
+    //     enableSorting: false,
+    //     enableHiding: false,
+    // },
     {
         accessorKey: "status",
-        header: "Status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Status
+                    <ArrowUpDown className="tw-ml-2 tw-h-4 tw-w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => (
             <div className="tw-capitalize">{row.getValue("status")}</div>
         ),
@@ -136,17 +146,7 @@ export const columns: ColumnDef<Payment>[] = [
     },
     {
         accessorKey: "customerInfo",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Email
-                    <ArrowUpDown className="tw-ml-2 tw-h-4 tw-w-4" />
-                </Button>
-            )
-        },
+        header: () => <div className="tw-text-left">Email</div>,
         cell: ({ row }) => {
             return <div className="tw-lowercase">{row.original.customerInfo.email}</div>;
         },
@@ -188,7 +188,6 @@ export const columns: ColumnDef<Payment>[] = [
         cell: ({ row }) => {
             const payment = row.original
             // const { register, handleSubmit, ...rest } = useForm();
-            const navigate = useNavigate();
             const queryClient = useQueryClient()
             const changeStatus = useMutation({
                 mutationFn: async (item: any) => {
@@ -197,7 +196,7 @@ export const columns: ColumnDef<Payment>[] = [
                 }, onSuccess: () => {
                     toast.success("Thay đổi trạng thái thành công!");
                     queryClient.invalidateQueries('ORDER_DATA_KEY');
-                    navigate('/admin/order');
+                    // navigate('/admin/order');
                 }
             })
             // const onSubmit = (data: any) => {
@@ -222,7 +221,7 @@ export const columns: ColumnDef<Payment>[] = [
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="tw-h-8 tw-w-auto tw-p-0">
-                            <span className="tw-sr-only">Open menu</span>
+                            {/* <span className="tw-sr-only">Open menu</span> */}
                             <MoreHorizontal className="tw-h-4 tw-w-4" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -236,67 +235,68 @@ export const columns: ColumnDef<Payment>[] = [
                         {payment.status === "Hủy" || payment.status === "Hoàn thành"
                             ? null
                             :
-                            <Dialog>
-                                <DialogTrigger className="tw-relative tw-w-full tw-flex tw-cursor-default tw-select-none tw-items-center tw-rounded-sm tw-px-2 tw-py-1.5 tw-text-sm tw-outline-none tw-transition-colors focus:tw-bg-slate-100 focus:tw-text-slate-900 data-[disabled]:tw-pointer-events-none data-[disabled]:tw-opacity-50 dark:focus:tw-bg-slate-800 dark:focus:tw-text-slate-50 hover:tw-bg-slate-100">
-                                    Change status
-                                </DialogTrigger>
-                                <DialogContent className="tw-sm:max-w-[425px]">
-                                    <DialogHeader>
-                                        <DialogTitle>Change status</DialogTitle>
-                                        <DialogDescription>
-                                            Make changes to your status here. Click save when you're done.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <Form {...form}>
-                                        <form onSubmit={form.handleSubmit(onSubmit)} className="tw-w-full tw-space-y-6">
-                                            <FormField
-                                                control={form.control}
-                                                name="status"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <SelectTrigger className="tw-w-full">
-                                                                <SelectValue placeholder="Select a status" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectGroup>
-                                                                    <SelectLabel>Status</SelectLabel>
-                                                                    {payment.status === "Chờ xác nhận"
-                                                                        ? <SelectItem value="Hủy">Hủy</SelectItem>
-                                                                        : <SelectItem disabled value="Hủy">Hủy</SelectItem>}
+                            // <Dialog>
+                            //     <DialogTrigger className="tw-relative tw-w-full tw-flex tw-cursor-default tw-select-none tw-items-center tw-rounded-sm tw-px-2 tw-py-1.5 tw-text-sm tw-outline-none tw-transition-colors focus:tw-bg-slate-100 focus:tw-text-slate-900 data-[disabled]:tw-pointer-events-none data-[disabled]:tw-opacity-50 dark:focus:tw-bg-slate-800 dark:focus:tw-text-slate-50 hover:tw-bg-slate-100">
+                            //         Change status
+                            //     </DialogTrigger>
+                            //     <DialogContent className="tw-sm:max-w-[425px]">
+                            //         <DialogHeader>
+                            //             <DialogTitle>Change status</DialogTitle>
+                            //             <DialogDescription>
+                            //                 Make changes to your status here. Click save when you're done.
+                            //             </DialogDescription>
+                            //         </DialogHeader>
+                            //         <Form {...form}>
+                            //             <form onSubmit={form.handleSubmit(onSubmit)} className="tw-w-full tw-space-y-6">
+                            //                 <FormField
+                            //                     control={form.control}
+                            //                     name="status"
+                            //                     render={({ field }) => (
+                            //                         <FormItem>
+                            //                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            //                                 <SelectTrigger className="tw-w-full">
+                            //                                     <SelectValue placeholder="Select a status" />
+                            //                                 </SelectTrigger>
+                            //                                 <SelectContent>
+                            //                                     <SelectGroup>
+                            //                                         <SelectLabel>Status</SelectLabel>
+                            //                                         {payment.status === "Chờ xác nhận"
+                            //                                             ? <SelectItem value="Hủy">Hủy</SelectItem>
+                            //                                             : <SelectItem disabled value="Hủy">Hủy</SelectItem>}
 
-                                                                    {payment.status === "Đóng gói" || payment.status === "Đang giao" || payment.status === "Hoàn thành" || payment.status === "Hủy"
-                                                                        ? <SelectItem disabled value="Chờ xác nhận">Chờ xác nhận</SelectItem>
-                                                                        : <SelectItem value="Chờ xác nhận">Chờ xác nhận</SelectItem>}
+                            //                                         {payment.status === "Đóng gói" || payment.status === "Đang giao" || payment.status === "Hoàn thành" || payment.status === "Hủy"
+                            //                                             ? <SelectItem disabled value="Chờ xác nhận">Chờ xác nhận</SelectItem>
+                            //                                             : <SelectItem value="Chờ xác nhận">Chờ xác nhận</SelectItem>}
 
-                                                                    {payment.status === "Đang giao" || payment.status === "Hoàn thành" || payment.status === "Hủy"
-                                                                        ? <SelectItem disabled value="Đóng gói">Đóng gói</SelectItem>
-                                                                        : <SelectItem value="Đóng gói">Đóng gói</SelectItem>}
+                            //                                         {payment.status === "Đang giao" || payment.status === "Hoàn thành" || payment.status === "Hủy"
+                            //                                             ? <SelectItem disabled value="Đóng gói">Đóng gói</SelectItem>
+                            //                                             : <SelectItem value="Đóng gói">Đóng gói</SelectItem>}
 
-                                                                    {payment.status === "Hoàn thành" || payment.status === "Hủy"
-                                                                        ? <SelectItem disabled value="Đang giao">Đang giao</SelectItem>
-                                                                        : <SelectItem value="Đang giao">Đang giao</SelectItem>}
+                            //                                         {payment.status === "Hoàn thành" || payment.status === "Hủy"
+                            //                                             ? <SelectItem disabled value="Đang giao">Đang giao</SelectItem>
+                            //                                             : <SelectItem value="Đang giao">Đang giao</SelectItem>}
 
-                                                                    <SelectItem value="Hoàn thành">Hoàn thành</SelectItem>
-                                                                </SelectGroup>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <DialogFooter>
-                                                <DropdownMenuItem>
-                                                    <Button> Save changes</Button>
-                                                </DropdownMenuItem>
-                                            </DialogFooter>
-                                        </form>
-                                    </Form>
-                                </DialogContent>
-                            </Dialog>
+                            //                                         <SelectItem value="Hoàn thành">Hoàn thành</SelectItem>
+                            //                                     </SelectGroup>
+                            //                                 </SelectContent>
+                            //                             </Select>
+                            //                             <FormMessage />
+                            //                         </FormItem>
+                            //                     )}
+                            //                 />
+                            //                 <DialogFooter>
+                            //                     <DropdownMenuItem>
+                            //                         <Button type="submit"> Save changes</Button>
+                            //                     </DropdownMenuItem>
+                            //                 </DialogFooter>
+                            //             </form>
+                            //         </Form>
+                            //     </DialogContent>
+                            // </Dialog>
+                            <DropdownMenuItem><Link to={`/admin/order/change/${payment._id}`}>Change status</Link></DropdownMenuItem>
                         }
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
+                        {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
                         <DropdownMenuItem><Link to={`/admin/order/${value}`}>View payment details</Link></DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu >
@@ -306,7 +306,7 @@ export const columns: ColumnDef<Payment>[] = [
 ]
 
 export function DataTableDemo() {
-    const { data } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ['ORDER_DATA_KEY'],
         queryFn: async () => {
             const { data } = await axios.get(`http://localhost:8080/api/order`);
@@ -340,6 +340,8 @@ export function DataTableDemo() {
         },
     })
 
+    if (isLoading) return <div>Loading...</div>
+    if (isError) return <div>Error</div>
     return (
         <>
             <div className="container-table tw-w-full tw-p-5">

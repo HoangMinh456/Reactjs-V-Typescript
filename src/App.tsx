@@ -1,4 +1,3 @@
-import { useContext, useEffect, useState } from 'react'
 import './App.scss'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -8,7 +7,6 @@ import UpdatePage from './components/admin/UpdatePage'
 import Layout from './components/Layout'
 import HomePage from './components/HomePage'
 import ShopPage from './components/ShopPage'
-import Singupin from './components/Signup';
 import LayoutAdmin from './components/admin/LayoutAdmin';
 import { TableDemo } from './components/admin/Table';
 import ProductDetail from './components/ProductDetail';
@@ -33,6 +31,11 @@ import CartPage from './components/CartPage';
 import OrderPage from './components/OrderPage';
 import { DataTableDemo } from './components/admin/OrderAdminPage';
 import OrderDetailAdmin from './components/admin/OrderDetailAdmin';
+import { useState } from 'react';
+import { UserAdmin } from './components/admin/UserAdmin';
+import { useLocalStorage } from './hooks/useStorage';
+import { AppProvider } from './context/ProductContextProvider';
+import OrderChangeAdmin from './components/admin/OrderChangeAdmin';
 
 type Prodduct = {
   _id?: any,
@@ -48,6 +51,7 @@ type Prodduct = {
 
 
 function App() {
+  const [check, setCheck] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   // const products = useQuery({
@@ -78,21 +82,36 @@ function App() {
   const addAttribute = useMutation({
     mutationFn: async (item) => {
       const response = await axios.post(`http://localhost:8080/api/attribute`, item);
-      return response.data._id;
+      // console.log(response.data);
+      return response.data;
     }
   })
 
   const addPro = useMutation({
     mutationFn: async (item) => {
-      const { data } = await axios.post(`http://localhost:8080/api/products`, item);
+      const token = localStorage.getItem('token');
+      const { data } = await axios.post(`http://localhost:8080/api/products`, item,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries('PRODUCTS_LISTS');
       toast.success('Thêm sản phẩm thành công');
       navigate(`/admin/products`);
+    }, onError: (error) => {
+      if ((error as any).response.data.error === 'Hết hạn token') {
+        const confirm = window.confirm('Hết hạn token, bạn có muốn đăng nhập lại không?');
+        if (confirm) {
+          navigate('/login');
+        }
+      }
     }
-  })
+  });
 
   const updatePro = useMutation({
     mutationFn: async (item: any) => {
@@ -121,15 +140,19 @@ function App() {
         price: product.price,
         pricesale: product.pricesale
       }
+      // console.log(attri);
       const attriId = await addAttribute.mutateAsync(attri);
+      // console.log(attriId)
       const newProduct = {
         ...product,
         attribute: attriId
       }
+      // console.log(newProduct);
       await addPro.mutateAsync(newProduct);
     } catch (error) {
       console.log(error);
       toast.error('Thêm sản phẩm thất bại');
+      setCheck(false);
     }
   }
 
@@ -168,40 +191,49 @@ function App() {
 
   return (
     <>
-      <Routes>
-        <Route path='/admin' element={<LayoutAdmin />}>
-          <Route index element={<Dashboard />} />
-          <Route path='products' element={<TableDemo removeProduct={onHandleRemove} />} />
-          <Route path='products/add' element={<AddProductPage onAdd={onHandleAdd} />} />
-          <Route path='products/:id/edit' element={<UpdatePage onUpdate={onHanldeUpdate} />} />
-          {/* Attribute  */}
-          <Route path='products/attribute/:id' element={<AttributePage />} />
-          <Route path='products/attribute/add/:id' element={<AddAttribute />} />
-          <Route path='products/attribute/:id/edit/:idpro' element={<UpdateAttribute />} />
-          <Route path='category' element={<CategoryAdmin />} />
-          <Route path='category/add' element={<AddCategory />} />
-          <Route path='category/:id/edit' element={<UpdateCategory />} />
-          <Route path='tags' element={<TagsAdmin />} />
-          <Route path='tags/add' element={<AddTags />} />
-          <Route path='tags/edit/:id' element={<UpdateTags />} />
-          <Route path='size' element={<SizePage />} />
-          <Route path='size/add' element={<AddSize />} />
-          <Route path='size/edit/:id' element={<UpdateSize />} />
-          <Route path='order' element={<DataTableDemo />} />
-          <Route path='order/:id' element={<OrderDetailAdmin />} />
-          {/* <Route path='table' element={<TableDemo products={products} />} /> */}
-        </Route>
-        <Route path='/' element={<Layout />} >
-          <Route index element={<HomePage products={productslatest} />} />
-          <Route path='/shop' element={<ShopPage />} />
-          <Route path='/product/:id/:idAttri' element={<ProductDetail />} />
-          <Route path='/signup' element={<Signup />} />
-          <Route path='/signin' element={<Singin />} />
-          <Route path='/cart' element={<CartPage />} />
-          <Route path='/order' element={<OrderPage />} />
-        </Route>
-      </Routes>
-      <ToastContainer />
+      <AppProvider>
+        <Routes>
+          <Route path='/admin' element={<LayoutAdmin />}>
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='products' element={<TableDemo removeProduct={onHandleRemove} />} />
+            <Route path='products/add' element={<AddProductPage onAdd={onHandleAdd} check={check} setCheck={setCheck} />} />
+            <Route path='products/:id/edit' element={<UpdatePage onUpdate={onHanldeUpdate} />} />
+            {/* Attribute  */}
+            <Route path='products/attribute/:id' element={<AttributePage />} />
+            <Route path='products/attribute/add/:id' element={<AddAttribute />} />
+            <Route path='products/attribute/:id/edit/:idpro' element={<UpdateAttribute />} />
+            {/* Category */}
+            <Route path='category' element={<CategoryAdmin />} />
+            <Route path='category/add' element={<AddCategory />} />
+            <Route path='category/:id/edit' element={<UpdateCategory />} />
+            {/* Tags  */}
+            <Route path='tags' element={<TagsAdmin />} />
+            <Route path='tags/add' element={<AddTags />} />
+            <Route path='tags/edit/:id' element={<UpdateTags />} />\
+            {/* Size  */}
+            <Route path='size' element={<SizePage />} />
+            <Route path='size/add' element={<AddSize />} />
+            <Route path='size/edit/:id' element={<UpdateSize />} />
+            {/* User  */}
+            <Route path='user' element={<UserAdmin />} />
+            {/* Order  */}
+            <Route path='order' element={<DataTableDemo />} />
+            <Route path='order/:id' element={<OrderDetailAdmin />} />
+            <Route path='order/change/:id' element={<OrderChangeAdmin />} />
+            {/* <Route path='table' element={<TableDemo products={products} />} /> */}
+          </Route>
+          <Route path='/' element={<Layout />} >
+            <Route index element={<HomePage products={productslatest} />} />
+            {/* <Route path='/shop' element={<ShopPage />} /> */}
+            <Route path='/product/:id/:idAttri' element={<ProductDetail />} />
+            <Route path='/signup' element={<Signup />} />
+            <Route path='/signin' element={<Singin />} />
+            <Route path='/cart' element={<CartPage />} />
+            <Route path='/order' element={<OrderPage />} />
+          </Route>
+        </Routes>
+      </AppProvider>
+      <ToastContainer closeOnClick stacked />
     </>
   )
 }

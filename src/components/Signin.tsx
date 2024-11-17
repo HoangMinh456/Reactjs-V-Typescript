@@ -1,16 +1,18 @@
+import { AppContext } from '@/context/ProductContextProvider';
 import { useLocalStorage } from '@/hooks/useStorage';
 import { signinForm } from '@/interfaces/signin';
 import { signupForm } from '@/interfaces/signup';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react'
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react'
+import { set, useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Singin = () => {
     const [toggle, setToggle] = useState(false);
-    const [, setUser] = useLocalStorage('user', {})
+    const { setUserId }: any = useContext(AppContext)
+    const navigate = useNavigate();
 
     function toggleAuth() {
         setToggle(!toggle);
@@ -30,7 +32,11 @@ const Singin = () => {
         },
         onSuccess: (data) => {
             toast.success('Đăng nhập thành công');
-            setUser(data);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            // console.log(data.user.role)
+            setUserId(data.user._id)
+            navigate('/')
         }
     })
 

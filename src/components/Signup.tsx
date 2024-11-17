@@ -5,6 +5,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
     const [toggle, setToggle] = useState(true);
@@ -26,6 +27,8 @@ const Signup = () => {
         mutationFn: async (user: signupForm) => {
             const { data } = await axios.post(`http://localhost:8080/api/signup`, user);
             return data
+        }, onSuccess: () => {
+            toast.success('Signup thành công');
         }
     })
 

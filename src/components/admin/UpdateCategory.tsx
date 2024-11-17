@@ -28,25 +28,39 @@ const UpdateCategory = () => {
             return data;
         }
     })
+
     useEffect(() => {
         reset(data);
     }, [data])
     const mutation = useMutation({
         mutationFn: async (category: any) => {
-            const { data } = await axios.put(`http://localhost:8080/api/category/${id}`, category);
+            const token = localStorage.getItem('token');
+            // console.log(token)
+            const { data } = await axios.put(`http://localhost:8080/api/category/${id}`, category,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
             return data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries('CATEGORY_UPDATE_KEY');
+            toast.success('Cập nhật thành công');
+            navigate('/admin/category');
+        }, onError: (error) => {
+            if ((error as any).response.data.error === 'Hết hạn token') {
+                const confirm = window.confirm('Hết hạn token, bạn có muốn đăng nhập lại không?');
+                if (confirm) {
+                    navigate('/login');
+                }
+            }
         }
     })
     const onSubmit: SubmitHandler<Input> = async (data) => {
         // console.log(data);
         mutation.mutate(data);
-
-        navigate('/admin/category');
-        toast.success('Cập nhật thành công');
-
     }
 
     return (
